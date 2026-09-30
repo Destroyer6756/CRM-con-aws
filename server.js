@@ -6,7 +6,34 @@ const crypto = require('crypto');
 const db = require('./db');
 
 const app = express();
-app.use(cors());
+
+// Configuración CORS dinámica
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',')
+  : ['http://localhost:3000', 'http://127.0.0.1:3000'];
+
+app.use(cors({
+  origin: function(origin, callback) {
+    // En desarrollo sin origin (server-to-server) permitir
+    if (!origin) return callback(null, true);
+
+    // Si es origen permitido o desarrollo
+    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
+      callback(null, true);
+    } else {
+      // En producción, si tiene el mismo dominio o es subdominio de Vercel
+      const isSameDomain = origin.includes(process.env.VERCEL_URL || '') ||
+                          origin.includes('.vercel.app');
+      if (isSameDomain) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    }
+  },
+  credentials: true
+}));
+
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -606,6 +633,7 @@ app.get('/api/health', (req, res) => {
 // ==========================================
 const PORT = process.env.PORT || 3000;
 
+// Solo iniciar el servidor localmente si no estamos en Vercel ni en test
 if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
   app.listen(PORT, () => {
     console.log(`🚀 Servidor Datanova CRM corriendo en puerto ${PORT}`);
@@ -613,4 +641,5 @@ if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
   });
 }
 
+// Exportar para Vercel Serverless Functions
 module.exports = app;

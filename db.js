@@ -7,6 +7,93 @@ const crypto = require('crypto');
 const DATA_DIR = path.join(__dirname, 'data');
 const DATA_FILE = path.join(DATA_DIR, 'crm_db.json');
 
+// SQL para crear todas las tablas necesarias
+const CREATE_TABLES_SQL = `
+  CREATE TABLE IF NOT EXISTS users (
+    id VARCHAR(255) PRIMARY KEY,
+    user_id VARCHAR(255) UNIQUE NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    role VARCHAR(100) DEFAULT 'Usuario',
+    avatar TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS facial_users (
+    id SERIAL PRIMARY KEY,
+    user_id VARCHAR(255) UNIQUE NOT NULL,
+    descriptor JSONB NOT NULL,
+    registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS crm_clients (
+    id VARCHAR(255) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    company VARCHAR(255),
+    email VARCHAR(255),
+    phone VARCHAR(100),
+    status VARCHAR(50) DEFAULT 'Lead',
+    value NUMERIC DEFAULT 0,
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS crm_deals (
+    id VARCHAR(255) PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    client_id VARCHAR(255),
+    client_name VARCHAR(255),
+    stage VARCHAR(50) DEFAULT 'Prospecto',
+    amount NUMERIC DEFAULT 0,
+    probability INT DEFAULT 10,
+    expected_close VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS bigdata_repositories (
+    id VARCHAR(255) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    category VARCHAR(100),
+    storage_type VARCHAR(100) DEFAULT 'AWS S3',
+    region VARCHAR(100),
+    tags JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS bigdata_datasets (
+    id VARCHAR(255) PRIMARY KEY,
+    repo_id VARCHAR(255),
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    format VARCHAR(50) DEFAULT 'Parquet',
+    size_mb NUMERIC DEFAULT 0,
+    row_count BIGINT DEFAULT 0,
+    quality_score INT DEFAULT 95,
+    null_percentage NUMERIC DEFAULT 0,
+    columns JSONB,
+    sample_data JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS crm_logs (
+    id VARCHAR(255) PRIMARY KEY,
+    type VARCHAR(50) NOT NULL,
+    description TEXT,
+    user_id VARCHAR(255),
+    user_name VARCHAR(255),
+    details TEXT,
+    ip VARCHAR(100),
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );
+`;
+
+// Función auxiliar para crear tablas (reutilizable por migrate.js)
+async function createTables(client) {
+  await client.query(CREATE_TABLES_SQL);
+}
+
 function hashPassword(password) {
   return crypto.createHash('sha256').update(password || '').digest('hex');
 }
@@ -351,10 +438,6 @@ const defaultData = {
   ]
 };
 
-function hashPassword(password) {
-  return crypto.createHash('sha256').update(password).digest('hex');
-}
-
 class DatabaseService {
   constructor() {
     this.usePostgres = false;
@@ -367,104 +450,31 @@ class DatabaseService {
     if (this.isInitialized) return;
 
     const hasPostgresConfig = !!(process.env.POSTGRES_URL || process.env.DATABASE_URL || process.env.DB_HOST);
+    const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
     
-    if (hasPostgresConfig || !process.env.FORCE_LOCAL_DB) {
+    // En producción, REQUERIMOS PostgreSQL
+    if (isProduction) {
+      if (!hasPostgresConfig) {
+        throw new Error('ERROR CRÍTICO: En producción se requiere configuración de PostgreSQL (DATABASE_URL o POSTGRES_URL). Configure las variables de entorno.');
+      }
+      
       try {
         const poolConfig = process.env.POSTGRES_URL || process.env.DATABASE_URL
-          ? { connectionString: process.env.POSTGRES_URL || process.env.DATABASE_URL, connectionTimeoutMillis: 3000 }
+          ? { connectionString: process.env.POSTGRES_URL || process.env.DATABASE_URL, connectionTimeoutMillis: 10000 }
           : {
-              host: process.env.DB_HOST || 'localhost',
-              user: process.env.DB_USER || 'postgres',
-              password: process.env.DB_PASSWORD || 'password',
-              database: process.env.DB_NAME || 'datanova_db',
+              host: process.env.DB_HOST,
+              user: process.env.DB_USER,
+              password: process.env.DB_PASSWORD,
+              database: process.env.DB_NAME,
               port: parseInt(process.env.DB_PORT, 10) || 5432,
-              connectionTimeoutMillis: 2000
+              connectionTimeoutMillis: 10000
             };
 
         this.pool = new Pool(poolConfig);
         const client = await this.pool.connect();
-        
+
         // Crear tablas incluyendo Repositorios y Datasets Big Data
-        await client.query(`
-          CREATE TABLE IF NOT EXISTS users (
-            id VARCHAR(255) PRIMARY KEY,
-            user_id VARCHAR(255) UNIQUE NOT NULL,
-            name VARCHAR(255) NOT NULL,
-            email VARCHAR(255) UNIQUE NOT NULL,
-            password_hash VARCHAR(255) NOT NULL,
-            role VARCHAR(100) DEFAULT 'Usuario',
-            avatar TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-          );
-
-          CREATE TABLE IF NOT EXISTS facial_users (
-            id SERIAL PRIMARY KEY,
-            user_id VARCHAR(255) UNIQUE NOT NULL,
-            descriptor JSONB NOT NULL,
-            registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-          );
-
-          CREATE TABLE IF NOT EXISTS crm_clients (
-            id VARCHAR(255) PRIMARY KEY,
-            name VARCHAR(255) NOT NULL,
-            company VARCHAR(255),
-            email VARCHAR(255),
-            phone VARCHAR(100),
-            status VARCHAR(50) DEFAULT 'Lead',
-            value NUMERIC DEFAULT 0,
-            notes TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-          );
-
-          CREATE TABLE IF NOT EXISTS crm_deals (
-            id VARCHAR(255) PRIMARY KEY,
-            title VARCHAR(255) NOT NULL,
-            client_id VARCHAR(255),
-            client_name VARCHAR(255),
-            stage VARCHAR(50) DEFAULT 'Prospecto',
-            amount NUMERIC DEFAULT 0,
-            probability INT DEFAULT 10,
-            expected_close VARCHAR(50),
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-          );
-
-          CREATE TABLE IF NOT EXISTS bigdata_repositories (
-            id VARCHAR(255) PRIMARY KEY,
-            name VARCHAR(255) NOT NULL,
-            description TEXT,
-            category VARCHAR(100),
-            storage_type VARCHAR(100) DEFAULT 'AWS S3',
-            region VARCHAR(100),
-            tags JSONB,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-          );
-
-          CREATE TABLE IF NOT EXISTS bigdata_datasets (
-            id VARCHAR(255) PRIMARY KEY,
-            repo_id VARCHAR(255),
-            name VARCHAR(255) NOT NULL,
-            description TEXT,
-            format VARCHAR(50) DEFAULT 'Parquet',
-            size_mb NUMERIC DEFAULT 0,
-            row_count BIGINT DEFAULT 0,
-            quality_score INT DEFAULT 95,
-            null_percentage NUMERIC DEFAULT 0,
-            columns JSONB,
-            sample_data JSONB,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-          );
-
-          CREATE TABLE IF NOT EXISTS crm_logs (
-            id VARCHAR(255) PRIMARY KEY,
-            type VARCHAR(50) NOT NULL,
-            description TEXT,
-            user_id VARCHAR(255),
-            user_name VARCHAR(255),
-            details TEXT,
-            ip VARCHAR(100),
-            timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-          );
-        `);
+        await createTables(client);
         
         client.release();
         this.usePostgres = true;
@@ -475,12 +485,45 @@ class DatabaseService {
           try { await this.pool.end(); } catch (e) {}
           this.pool = null;
         }
-        console.log('ℹ️ PostgreSQL no disponible localmente. Activando almacenamiento persistente local optimizado.');
+        console.error('❌ ERROR CRÍTICO: No se pudo conectar a PostgreSQL en producción:', err.message);
+        throw new Error(`Fallo de conexión a PostgreSQL en producción: ${err.message}`);
       }
-    }
+    } else {
+      // En desarrollo/local: intentar PostgreSQL, fallback a JSON si falla
+      if (hasPostgresConfig || !process.env.FORCE_LOCAL_DB) {
+        try {
+          const poolConfig = process.env.POSTGRES_URL || process.env.DATABASE_URL
+            ? { connectionString: process.env.POSTGRES_URL || process.env.DATABASE_URL, connectionTimeoutMillis: 3000 }
+            : {
+                host: process.env.DB_HOST || 'localhost',
+                user: process.env.DB_USER || 'postgres',
+                password: process.env.DB_PASSWORD || 'password',
+                database: process.env.DB_NAME || 'datanova_db',
+                port: parseInt(process.env.DB_PORT, 10) || 5432,
+                connectionTimeoutMillis: 2000
+              };
 
-    if (!this.usePostgres) {
-      this.initLocalStorage();
+          this.pool = new Pool(poolConfig);
+          const client = await this.pool.connect();
+
+          await createTables(client);
+          
+          client.release();
+          this.usePostgres = true;
+          console.log('✅ Base de datos PostgreSQL conectada y configurada exitosamente con soporte Big Data.');
+        } catch (err) {
+          this.usePostgres = false;
+          if (this.pool) {
+            try { await this.pool.end(); } catch (e) {}
+            this.pool = null;
+          }
+          console.log('ℹ️ PostgreSQL no disponible localmente. Activando almacenamiento persistente local optimizado.');
+        }
+      }
+
+      if (!this.usePostgres) {
+        this.initLocalStorage();
+      }
     }
 
     this.isInitialized = true;
@@ -1316,3 +1359,4 @@ class DatabaseService {
 }
 
 module.exports = new DatabaseService();
+module.exports.createTables = createTables;

@@ -26,11 +26,10 @@ const state = {
   activeRepoFilter: ''
 };
 
-// Rutas de APIs
-const isFileOrDev = window.location.protocol === 'file:' || ( (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port !== '3000' );
-const BASE_URL = isFileOrDev ? 'http://localhost:3000' : '';
-const MODEL_URL = BASE_URL + '/models';
-const API_BASE = BASE_URL + '/api';
+// Rutas de APIs - Usa rutas relativas para funcionar tanto en local como en producción
+const BASE_URL = ''; // Rutas relativas para funcionar en cualquier dominio
+const MODEL_URL = '/models';
+const API_BASE = '/api';
 
 // ============================================================================
 // 1. UTILIDADES Y SISTEMA DE NOTIFICACIONES TOAST
