@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Datanova CRM Enterprise - Reconocimiento Facial & Gestión Comercial</title>
+  
+  <!-- Favicon SVG -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>">
+  
+  <!-- Fuentes Google: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS Personalizado Ultra Profesional -->
+  <link rel="stylesheet" href="styles.css">
+  
+  <!-- Librería Face-api.js para Inteligencia Artificial Facial en el Navegador -->
+  <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+</head>
+<body class="dark-theme">
+
+  <!-- TOAST NOTIFICATIONS CONTAINER -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- ======================================================== -->
+  <!-- VISTA 1: PORTAL DE AUTENTICACIÓN (LOGIN DUAL)            -->
+  <!-- ======================================================== -->
+  <div id="authScreen" class="auth-screen">
+    <div class="auth-backdrop">
+      <div class="glow-orb orb-1"></div>
+      <div class="glow-orb orb-2"></div>
+      <div class="grid-overlay"></div>
+    </div>
+
+    <div class="auth-container">
+      <!-- Columna Izquierda: Presentación Corporativa -->
+      <div class="auth-brand-side">
+        <div class="brand-badge">
+          <span class="pulse-dot"></span>
+          <span id="backendStatusPill">Datanova CRM Cloud v2.0 • Biometría IA</span>
+        </div>
+        
+        <div class="brand-logo-hero">
+          <div class="logo-icon-wrapper">
+            <svg class="logo-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+              <polyline points="2 17 12 22 22 17"></polyline>
+              <polyline points="2 12 12 17 22 12"></polyline>
+            </svg>
+          </div>
+          <h1>Datanova <span>CRM</span></h1>
+        </div>
+
+        <p class="brand-tagline">
+          Plataforma de gestión comercial de alto rendimiento con autenticación de vanguardia impulsada por Redes Neuronales y AWS.
+        </p>
+
+        <div class="feature-pills">
+          <div class="feature-item">
+            <div class="f-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div>
+              <strong>Biometría Facial en Vivo</strong>
+              <span>Descriptores de 128 puntos con TinyFaceDetector</span>
+            </div>
+          </div>
+
+          <div class="feature-item">
+            <div class="f-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            </div>
+            <div>
+              <strong>Pipeline de Ventas Dinámico</strong>
+              <span>Gestión de leads, embudo kanban y analítica en tiempo real</span>
+            </div>
+          </div>
+
+          <div class="feature-item">
+            <div class="f-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+            </div>
+            <div>
+              <strong>Arquitectura Híbrida AWS RDS</strong>
+              <span>Compatibilidad con PostgreSQL y persistencia continua</span>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+
+      <!-- Columna Derecha: Tarjeta de Acceso con Tabs -->
+      <div class="auth-card-wrapper">
+        <div class="glass-card auth-card">
+          
+          <!-- Selector de Modo de Acceso (Tabs) -->
+          <div class="auth-tab-switch">
+            <button id="tabNormalBtn" class="auth-tab active" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <span>Login Normal</span>
+            </button>
+            <button id="tabFaceBtn" class="auth-tab" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a5 5 0 0 0-5 5v1a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5z"/><path d="M3 13v2a9 9 0 0 0 18 0v-2"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="9" r="1"/><path d="M10 13c.5.5 1.5.5 2 0"/><path d="M12 22v-3"/></svg>
+              <span>Acceso Facial IA</span>
+            </button>
+          </div>
+
+          <!-- PANEL 1: LOGIN NORMAL CON CREDENCIALES -->
+          <div id="panelNormalAuth" class="tab-panel active">
+            <div class="panel-header">
+              <h2>Bienvenido al CRM</h2>
+              <p>Ingresa con tu correo institucional y contraseña.</p>
+            </div>
+
+            <form id="formNormalLogin" class="auth-form" onsubmit="return false;">
+              <div class="form-group">
+                <label for="loginEmail">Correo Electrónico</label>
+                <div class="input-with-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  <input type="email" id="loginEmail" placeholder="admin@datanova.com" required autocomplete="username">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="label-row">
+                  <label for="loginPassword">Contraseña</label>
+                  <a href="#" id="forgotPassLink" class="text-link">¿Olvidaste tu contraseña?</a>
+                </div>
+                <div class="input-with-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+                  <button type="button" id="togglePasswordBtn" class="btn-icon-inside" title="Ver contraseña">
+                    <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-row-check">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="rememberMe" checked>
+                  <span>Recordar sesión en este equipo</span>
+                </label>
+              </div>
+
+              <button type="submit" id="submitLoginBtn" class="btn-primary-glow btn-full">
+                <span>Ingresar al CRM</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </button>
+            </form>
+
+            <div class="auth-divider">
+              <span>o regístrate si eres nuevo</span>
+            </div>
+
+            <button type="button" id="openRegisterModalBtn" class="btn-ghost btn-full">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+              Crear Nueva Cuenta de Usuario
+            </button>
+          </div>
+
+          <!-- PANEL 2: RECONOCIMIENTO FACIAL BIOMÉTRICO -->
+          <div id="panelFaceAuth" class="tab-panel">
+            <div class="panel-header">
+              <h2>Autenticación Facial</h2>
+              <p>Ponte frente a la cámara para escanear tu rostro biométrico.</p>
+            </div>
+
+            <!-- Visor HUD de Cámara -->
+            <div class="hud-camera-box">
+              <div class="camera-stream-container">
+                <video id="webcam" autoplay muted playsinline></video>
+                <canvas id="faceCanvas"></canvas>
+                
+                <!-- Retícula HUD Estilizada -->
+                <div class="hud-reticle">
+                  <div class="reticle-corner top-left"></div>
+                  <div class="reticle-corner top-right"></div>
+                  <div class="reticle-corner bottom-left"></div>
+                  <div class="reticle-corner bottom-right"></div>
+                  <div id="scanLaser" class="scan-laser"></div>
+                </div>
+
+                <!-- Overlay de Carga de Modelos / Permisos -->
+                <div id="cameraLoadingOverlay" class="camera-loading-overlay">
+                  <div class="cyber-spinner"></div>
+                  <p id="cameraLoadingText">Iniciando redes neuronales...</p>
+                </div>
+              </div>
+
+              <!-- Indicador de Detección de Rostro en Vivo -->
+              <div class="live-detection-status">
+                <span id="faceIndicatorDot" class="status-indicator-dot waiting"></span>
+                <span id="faceIndicatorText">Inicializando sensor de video...</span>
+                <span id="confidencePill" class="confidence-pill" style="display:none;">0%</span>
+              </div>
+            </div>
+
+            <!-- Botones de Acción Facial -->
+            <div class="face-actions-wrapper">
+              <button type="button" id="scanAndLoginBtn" class="btn-primary-glow btn-full" disabled>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 12 15 16 10"/></svg>
+                <span>Escanear y Autenticar</span>
+              </button>
+
+              <div class="face-sub-actions">
+                <button type="button" id="openFaceRegisterModalBtn" class="btn-subtle">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                  ¿No tienes rostro enrolado? Enrolar aquí
+                </button>
+              </div>
+            </div>
+
+            <!-- Feedback de Estado Facial -->
+            <div id="faceStatusBadge" class="status-badge-modern" style="display:none;"></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ======================================================== -->
+  <!-- VISTA 2: APLICACIÓN COMPLETA CRM ENTERPRISE              -->
+  <!-- ======================================================== -->
+  <div id="crmAppScreen" class="crm-screen" style="display: none;">
+    
+    <!-- BARRA LATERAL (SIDEBAR) -->
+    <aside class="crm-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <div class="logo-icon-sm">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+          </div>
+          <div class="sidebar-logo-text">
+            <h3>Datanova <span>CRM</span></h3>
+            <span class="workspace-badge">Cloud Enterprise</span>
+          </div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <span class="nav-section-title">PRINCIPAL</span>
+        <button class="nav-item active" data-view="dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+          <span>Dashboard & KPIs</span>
+        </button>
+
+        <button class="nav-item" data-view="clients">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Clientes & Leads</span>
+          <span id="navClientsCount" class="nav-counter">0</span>
+        </button>
+
+        <button class="nav-item" data-view="deals">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          <span>Pipeline & Deals</span>
+          <span id="navDealsCount" class="nav-counter">0</span>
+        </button>
+
+        <span class="nav-section-title">BIG DATA & DATASETS</span>
+        <button class="nav-item" data-view="repositories">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          <span>Repositorios Big Data</span>
+          <span id="navReposCount" class="nav-counter">0</span>
+        </button>
+
+        <button class="nav-item" data-view="compare">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5"/><path d="M4 20L21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg>
+          <span>Comparador Datasets</span>
+          <span class="badge-mini-accent">Diff IA</span>
+        </button>
+
+        <span class="nav-section-title">SEGURIDAD & IA</span>
+        <button class="nav-item" data-view="biometrics">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a5 5 0 0 0-5 5v1a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5z"/><path d="M3 13v2a9 9 0 0 0 18 0v-2"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="9" r="1"/><path d="M10 13c.5.5 1.5.5 2 0"/><path d="M12 22v-3"/></svg>
+          <span>Biometría & Accesos</span>
+          <span id="navBiometricsIndicator" class="status-dot-sm success"></span>
+        </button>
+
+        <button class="nav-item" data-view="face-compare">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Comparador de Rostros</span>
+          <span class="badge-mini-accent">IA</span>
+        </button>
+
+        <button class="nav-item" data-view="settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Configuración & Nube</span>
+        </button>
+      </nav>
+
+      <!-- Resumen de Usuario Activo en Sidebar -->
+      <div class="sidebar-user-footer">
+        <div class="user-card-sm">
+          <img id="sidebarUserAvatar" class="avatar-sm" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" alt="Avatar">
+          <div class="user-info-text">
+            <span id="sidebarUserName" class="user-name">Admin Datanova</span>
+            <span id="sidebarUserRole" class="user-role">Administrador</span>
+          </div>
+        </div>
+        <button id="sidebarLogoutBtn" class="btn-logout-icon" title="Cerrar sesión">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ÁREA DE CONTENIDO PRINCIPAL -->
+    <main class="crm-main-viewport">
+      
+      <!-- HEADER SUPERIOR -->
+      <header class="crm-topbar">
+        <div class="topbar-left">
+          <h1 id="viewTitle">Dashboard General</h1>
+          <span id="viewSubtitle" class="topbar-breadcrumb">Resumen ejecutivo y métricas comerciales</span>
+        </div>
+
+        <div class="topbar-center">
+          <div class="global-search-bar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="globalSearchInput" placeholder="Buscar clientes, deals, correos...">
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <!-- Indicador de Conexión de Almacenamiento -->
+          <div class="storage-status-pill" id="storageStatusPill">
+            <span class="status-pulse-green"></span>
+            <span id="storageStatusText">Almacenamiento Activo</span>
+          </div>
+
+          <!-- Botón Rápido "+ Nuevo Lead" -->
+          <button id="topbarNewClientBtn" class="btn-primary-sm">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Nuevo Cliente</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- VISTA 2.1: DASHBOARD -->
+      <section id="viewDashboard" class="view-panel active">
+        <!-- Tarjetas de Métricas Clave (KPIs) -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-label">TOTAL CLIENTES & LEADS</span>
+              <div class="kpi-icon-badge blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value-row">
+              <h2 id="kpiTotalClients" class="kpi-number">0</h2>
+              <span class="kpi-trend up">+14% vs mes anterior</span>
+            </div>
+            <div class="kpi-footer-text">Cartera activa en seguimiento</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-label">VALOR TOTAL PIPELINE</span>
+              <div class="kpi-icon-badge indigo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value-row">
+              <h2 id="kpiPipelineValue" class="kpi-number">$0</h2>
+              <span class="kpi-trend up">+22% proyectado</span>
+            </div>
+            <div class="kpi-footer-text">Oportunidades en curso</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-label">INGRESOS CERRADOS (WON)</span>
+              <div class="kpi-icon-badge emerald">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value-row">
+              <h2 id="kpiWonValue" class="kpi-number">$0</h2>
+              <span class="kpi-trend up">+18% meta cumplida</span>
+            </div>
+            <div class="kpi-footer-text">Ventas confirmadas este ciclo</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-label">PERFILES FACIALES ACTIVOS</span>
+              <div class="kpi-icon-badge cyan">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value-row">
+              <h2 id="kpiFacialCount" class="kpi-number">0</h2>
+              <span class="kpi-trend success">Biometría 100% Operativa</span>
+            </div>
+            <div class="kpi-footer-text">Usuarios autenticables con IA</div>
+          </div>
+        </div>
+
+        <!-- Sección de Gráficos y Actividad -->
+        <div class="dashboard-split-grid">
+          <!-- Gráfico de Embudo Comercial -->
+          <div class="dashboard-card">
+            <div class="card-header-row">
+              <div>
+                <h3>Rendimiento del Embudo Comercial</h3>
+                <span class="subtext">Distribución del valor de las oportunidades</span>
+              </div>
+              <span class="badge-accent">Actualizado en vivo</span>
+            </div>
+
+            <div class="funnel-chart-container">
+              <div class="funnel-bar-item">
+                <div class="funnel-label-row">
+                  <span>1. Prospecto inicial</span>
+                  <span id="funnelValProspect">$0</span>
+                </div>
+                <div class="funnel-progress-bg">
+                  <div id="funnelBarProspect" class="funnel-progress-fill stage-1" style="width: 25%"></div>
+                </div>
+              </div>
+
+              <div class="funnel-bar-item">
+                <div class="funnel-label-row">
+                  <span>2. Contactado / Descubrimiento</span>
+                  <span id="funnelValContact">$0</span>
+                </div>
+                <div class="funnel-progress-bg">
+                  <div id="funnelBarContact" class="funnel-progress-fill stage-2" style="width: 45%"></div>
+                </div>
+              </div>
+
+              <div class="funnel-bar-item">
+                <div class="funnel-label-row">
+                  <span>3. Propuesta Económica</span>
+                  <span id="funnelValProp">$0</span>
+                </div>
+                <div class="funnel-progress-bg">
+                  <div id="funnelBarProp" class="funnel-progress-fill stage-3" style="width: 65%"></div>
+                </div>
+              </div>
+
+              <div class="funnel-bar-item">
+                <div class="funnel-label-row">
+                  <span>4. Negociación Final</span>
+                  <span id="funnelValNeg">$0</span>
+                </div>
+                <div class="funnel-progress-bg">
+                  <div id="funnelBarNeg" class="funnel-progress-fill stage-4" style="width: 80%"></div>
+                </div>
+              </div>
+
+              <div class="funnel-bar-item">
+                <div class="funnel-label-row">
+                  <span>5. Cerrado Ganado</span>
+                  <span id="funnelValWon">$0</span>
+                </div>
+                <div class="funnel-progress-bg">
+                  <div id="funnelBarWon" class="funnel-progress-fill stage-5" style="width: 100%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Feed de Actividad y Accesos Recientes -->
+          <div class="dashboard-card">
+            <div class="card-header-row">
+              <div>
+                <h3>Auditoría de Actividad & Accesos</h3>
+                <span class="subtext">Registros de login y modificaciones CRM</span>
+              </div>
+              <button id="refreshLogsBtn" class="btn-icon-refresh" title="Actualizar logs">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              </button>
+            </div>
+
+            <div class="activity-feed-list" id="activityFeedList">
+              <!-- Se puebla dinámicamente con JS -->
+              <div class="empty-state-card">Cargando actividad del sistema...</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VISTA 2.2: CLIENTES & LEADS -->
+      <section id="viewClients" class="view-panel">
+        <div class="table-toolbar">
+          <div class="toolbar-filters">
+            <button class="filter-pill active" data-status="Todos">Todos</button>
+            <button class="filter-pill" data-status="Lead">Leads</button>
+            <button class="filter-pill" data-status="Contactado">Contactados</button>
+            <button class="filter-pill" data-status="Propuesta">Propuesta</button>
+            <button class="filter-pill" data-status="Negociación">Negociación</button>
+            <button class="filter-pill" data-status="Ganado">Ganados</button>
+          </div>
+
+          <div class="toolbar-actions">
+            <button id="openNewClientModalBtn" class="btn-primary-glow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span>Agregar Cliente</span>
+            </button>
+            <button id="exportCsvBtn" class="btn-outline">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>Exportar</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="table-container-card">
+          <table class="crm-table">
+            <thead>
+              <tr>
+                <th>CLIENTE / CONTACTO</th>
+                <th>EMPRESA</th>
+                <th>TELÉFONO & CORREO</th>
+                <th>ESTADO</th>
+                <th>VALOR ESTIMADO</th>
+                <th style="text-align: right;">ACCIONES</th>
+              </tr>
+            </thead>
+            <tbody id="clientsTableBody">
+              <!-- Poblado dinámicamente -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- VISTA 2.3: PIPELINE DEALS (KANBAN) -->
+      <section id="viewDeals" class="view-panel">
+        <div class="kanban-header-bar">
+          <div>
+            <h3>Pipeline Comercial (Embudo Kanban)</h3>
+            <p>Mueve las oportunidades de etapa con un solo clic</p>
+          </div>
+          <button id="openNewDealModalBtn" class="btn-primary-glow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Nueva Oportunidad</span>
+          </button>
+        </div>
+
+        <div class="kanban-board-grid">
+          <!-- Columna 1: Prospecto -->
+          <div class="kanban-column" data-stage="Prospecto">
+            <div class="column-header">
+              <div class="col-title-row">
+                <span class="col-dot dot-gray"></span>
+                <h4>Prospectos</h4>
+              </div>
+              <span id="colCountProspect" class="badge-count">0</span>
+            </div>
+            <div class="column-cards-list" id="colCardsProspect"></div>
+          </div>
+
+          <!-- Columna 2: Contactado -->
+          <div class="kanban-column" data-stage="Contactado">
+            <div class="column-header">
+              <div class="col-title-row">
+                <span class="col-dot dot-blue"></span>
+                <h4>Contactados</h4>
+              </div>
+              <span id="colCountContact" class="badge-count">0</span>
+            </div>
+            <div class="column-cards-list" id="colCardsContact"></div>
+          </div>
+
+          <!-- Columna 3: Propuesta -->
+          <div class="kanban-column" data-stage="Propuesta">
+            <div class="column-header">
+              <div class="col-title-row">
+                <span class="col-dot dot-yellow"></span>
+                <h4>Propuesta</h4>
+              </div>
+              <span id="colCountProp" class="badge-count">0</span>
+            </div>
+            <div class="column-cards-list" id="colCardsProp"></div>
+          </div>
+
+          <!-- Columna 4: Negociación -->
+          <div class="kanban-column" data-stage="Negociación">
+            <div class="column-header">
+              <div class="col-title-row">
+                <span class="col-dot dot-purple"></span>
+                <h4>Negociación</h4>
+              </div>
+              <span id="colCountNeg" class="badge-count">0</span>
+            </div>
+            <div class="column-cards-list" id="colCardsNeg"></div>
+          </div>
+
+          <!-- Columna 5: Ganado -->
+          <div class="kanban-column" data-stage="Ganado">
+            <div class="column-header">
+              <div class="col-title-row">
+                <span class="col-dot dot-green"></span>
+                <h4>Cerrado Ganado</h4>
+              </div>
+              <span id="colCountWon" class="badge-count">0</span>
+            </div>
+            <div class="column-cards-list" id="colCardsWon"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VISTA 2.4: BIOMETRÍA & SEGURIDAD -->
+      <section id="viewBiometrics" class="view-panel">
+        <div class="biometrics-grid">
+          
+          <!-- Tarjeta de Estado del Perfil Facial del Usuario Conectado -->
+          <div class="dashboard-card bio-profile-card">
+            <div class="card-header-row">
+              <div>
+                <h3>Estado Biométrico de tu Cuenta</h3>
+                <span class="subtext">Identificador facial de 128 descriptores neuronales</span>
+              </div>
+              <span id="currentUserBioBadge" class="badge-bio-status">Verificando...</span>
+            </div>
+
+            <div class="bio-user-status-box">
+              <div class="bio-avatar-ring">
+                <img id="bioUserAvatarImg" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200" alt="Face">
+                <div id="bioRingPulse" class="ring-pulse"></div>
+              </div>
+
+              <div class="bio-user-details">
+                <h4 id="bioUserFullName">Admin Datanova</h4>
+                <p id="bioUserEmail">admin@datanova.com</p>
+                <div class="bio-tags">
+                  <span id="bioAlgTag" class="tag-chip">Algoritmo: TinyFaceDetector + FaceRecognitionNet</span>
+                  <span id="bioStatusTag" class="tag-chip active">✓ Enrolamiento Activo</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="bio-actions-strip">
+              <button id="reEnrollFaceBtn" class="btn-primary-glow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                <span>Re-escanear y Actualizar Mi Rostro</span>
+              </button>
+              <button id="deleteFaceBtn" class="btn-danger-outline">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                <span>Eliminar Biometría</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Lista de Usuarios con Perfil Facial Enrolado -->
+          <div class="dashboard-card">
+            <div class="card-header-row">
+              <div>
+                <h3>Usuarios con Biometría Activa</h3>
+                <span class="subtext">Perfiles faciales registrados en el repositorio</span>
+              </div>
+            </div>
+
+            <div class="facial-users-list" id="facialUsersList">
+              <!-- Se puebla dinámicamente -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla Completa de Auditoría de Accesos -->
+        <div class="dashboard-card mt-6">
+          <div class="card-header-row">
+            <div>
+              <h3>Historial de Autenticaciones & Seguridad</h3>
+              <span class="subtext">Registro cronológico de logins normales vs reconocimiento facial</span>
+            </div>
+          </div>
+
+          <div class="table-container-card">
+            <table class="crm-table">
+              <thead>
+                <tr>
+                  <th>TIPO / MÉTODO</th>
+                  <th>USUARIO</th>
+                  <th>DETALLES TÉCNICOS</th>
+                  <th>IP / DISPOSITIVO</th>
+                  <th>FECHA Y HORA</th>
+                </tr>
+              </thead>
+              <tbody id="authAuditTableBody">
+                <!-- Se puebla dinámicamente -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+      <!-- VISTA NUEVA: COMPARADOR DE ROSTROS -->
+      <section id="viewFaceCompare" class="view-panel">
+        <div class="kanban-header-bar">
+          <div>
+            <h3>Comparador de Rostros (IA)</h3>
+            <p>Captura dos rostros distintos desde la cámara para calcular su similitud biométrica</p>
+          </div>
+        </div>
+
+        <div class="biometrics-grid mt-4">
+          <!-- Card de Captura -->
+          <div class="dashboard-card">
+            <div class="card-header-row">
+              <div>
+                <h3>Cámara en Vivo</h3>
+                <span class="subtext">Posiciónate frente a la cámara</span>
+              </div>
+            </div>
+            <div class="hud-camera-box" style="margin-top: 1rem;">
+              <div class="camera-stream-container">
+                <video id="compareWebcam" autoplay muted playsinline style="width: 100%; border-radius: 8px;"></video>
+                <canvas id="compareFaceCanvas" style="position: absolute; top: 0; left: 0; pointer-events: none;"></canvas>
+              </div>
+            </div>
+            <div class="action-btns-row mt-4" style="justify-content: center; gap: 1rem;">
+              <button id="captureFace1Btn" class="btn-primary-glow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                <span>Capturar Rostro 1</span>
+              </button>
+              <button id="captureFace2Btn" class="btn-primary-glow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                <span>Capturar Rostro 2</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Card de Resultados -->
+          <div class="dashboard-card">
+            <div class="card-header-row">
+              <div>
+                <h3>Análisis Comparativo</h3>
+                <span class="subtext">Resultados de la distancia euclidiana</span>
+              </div>
+            </div>
+            <div class="compare-results-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+              <div class="captured-face-box" style="text-align: center; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                <h4>Rostro 1</h4>
+                <canvas id="capturedCanvas1" width="160" height="160" style="background: #111; border-radius: 8px; margin-top: 10px; max-width: 100%; height: auto;"></canvas>
+                <div id="statusFace1" style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.5rem;">Pendiente</div>
+              </div>
+              <div class="captured-face-box" style="text-align: center; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                <h4>Rostro 2</h4>
+                <canvas id="capturedCanvas2" width="160" height="160" style="background: #111; border-radius: 8px; margin-top: 10px; max-width: 100%; height: auto;"></canvas>
+                <div id="statusFace2" style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.5rem;">Pendiente</div>
+              </div>
+            </div>
+            <div style="text-align: center; margin-top: 2rem;">
+              <button id="runFaceCompareBtn" class="btn-primary-glow btn-full" disabled>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5"/><path d="M4 20L21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg>
+                <span>Comparar Identidades</span>
+              </button>
+            </div>
+            <div id="compareResultBadge" class="status-badge-modern mt-4" style="display: none; text-align: center;">
+              --
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- VISTA 2.5: CONFIGURACIÓN & NUBE -->
+      <section id="viewSettings" class="view-panel">
+        <div class="settings-grid">
+          
+          <div class="dashboard-card">
+            <div class="card-header-row">
+              <div>
+                <h3>Infraestructura & Base de Datos</h3>
+                <span class="subtext">Configuración de almacenamiento y AWS</span>
+              </div>
+              <span class="badge-accent">Estado del Sistema</span>
+            </div>
+
+            <div class="infra-status-card">
+              <div class="infra-row">
+                <span class="infra-label">Motor de Base de Datos:</span>
+                <span id="cfgDbMode" class="infra-val">PostgreSQL / Local Persistent Store</span>
+              </div>
+              <div class="infra-row">
+                <span class="infra-label">Estado de Conexión:</span>
+                <span id="cfgDbStatus" class="infra-val green">● En línea y Operativo</span>
+              </div>
+              <div class="infra-row">
+                <span class="infra-label">Integración Cloud AWS:</span>
+                <span class="infra-val">Soporte nativo para AWS RDS, EC2 & ECS</span>
+              </div>
+              <div class="infra-row">
+                <span class="infra-label">Modelos de IA:</span>
+                <span class="infra-val green">TinyFaceDetector + FaceLandmark68 + FaceRecognition</span>
+              </div>
+            </div>
+
+            <div class="form-group mt-4">
+              <label>Sensibilidad del Reconocimiento Facial (Umbral de Distancia Euclidiana)</label>
+              <div class="slider-wrapper">
+                <input type="range" id="thresholdSlider" min="0.35" max="0.65" step="0.05" value="0.55">
+                <div class="slider-labels">
+                  <span>0.35 (Muy Estricto)</span>
+                  <span id="thresholdValDisplay">0.55 (Recomendado)</span>
+                  <span>0.65 (Más Tolerante)</span>
+                </div>
+              </div>
+              <p class="input-helper">Valores menores a 0.55 requieren mayor coincidencia entre el rostro escaneado y el registrado.</p>
+            </div>
+          </div>
+
+          <div class="dashboard-card">
+            <div class="card-header-row">
+              <div>
+                <h3>Información de la Suite Datanova</h3>
+                <span class="subtext">Especificaciones de la versión</span>
+              </div>
+            </div>
+
+            <div class="about-suite-content">
+              <p>
+                <strong>Datanova CRM Enterprise</strong> combina herramientas de prospección comercial B2B con algoritmos de visión por computadora basados en TensorFlow.js y face-api.
+              </p>
+              <ul>
+                <li><strong>Backend:</strong> Node.js con Express, PostgreSQL nativo (pg Pool) y fallback resiliente.</li>
+                <li><strong>Frontend:</strong> Interfaz moderna reactiva con diseño Glassmorphism, CSS de alta fidelidad y renderizado de retícula HUD.</li>
+                <li><strong>Seguridad:</strong> Hash criptográfico SHA-256 para contraseñas y vectores de 128 dimensiones para perfiles faciales.</li>
+              </ul>
+              
+              <div class="about-action-row">
+                <button type="button" id="backupDataBtn" class="btn-outline">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Descargar Copia de Seguridad JSON
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- VISTA 2.6: REPOSITORIOS BIG DATA & DATASETS -->
+      <section id="viewRepositories" class="view-panel">
+        <!-- Resumen de Métricas Big Data -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-label">REPOSITORIOS ACTIVOS</span>
+              <div class="kpi-icon-badge blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value-row">
+              <h2 id="statTotalRepos" class="kpi-number">3</h2>
+              <span class="kpi-trend up">AWS S3 & Cloud</span>
+            </div>
+            <div class="kpi-footer-text">Lakes y almacenes federados</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-label">TOTAL DATASETS</span>
+              <div class="kpi-icon-badge cyan">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value-row">
+              <h2 id="statTotalDatasets" class="kpi-number">4</h2>
+              <span class="kpi-trend success">Parquet / JSON / Delta</span>
+            </div>
+            <div class="kpi-footer-text">Archivos estructurados listos</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-label">REGISTROS PROCESADOS</span>
+              <div class="kpi-icon-badge indigo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value-row">
+              <h2 id="statTotalBigDataRows" class="kpi-number">9.27 M</h2>
+              <span class="kpi-trend up">+32% este ciclo</span>
+            </div>
+            <div class="kpi-footer-text">Eventos y transacciones indexadas</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-label">VOLUMEN TOTAL ALMACENADO</span>
+              <div class="kpi-icon-badge emerald">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value-row">
+              <h2 id="statTotalVolume" class="kpi-number">2.56 GB</h2>
+              <span class="kpi-trend success">Compresión Parquet</span>
+            </div>
+            <div class="kpi-footer-text">Optimizado para consultas en paralelo</div>
+          </div>
+        </div>
+
+        <!-- Barra de Acciones de Repositorios -->
+        <div class="table-toolbar">
+          <div class="toolbar-filters">
+            <h3 style="font-size:1.15rem; font-weight:700;">Repositorios de Datos (Data Lakes)</h3>
+          </div>
+          <div class="toolbar-actions">
+            <button id="openNewRepoModalBtn" class="btn-primary-glow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span>Nuevo Repositorio</span>
+            </button>
+            <button id="openNewDatasetModalBtn" class="btn-outline">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span>Incorporar Dataset</span>
+            </button>
+            <button id="jumpToCompareBtn" class="btn-primary-sm" style="background:linear-gradient(135deg,#06b6d4,#3b82f6);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5"/><path d="M4 20L21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg>
+              <span>Comparar Datasets</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Grid de Repositorios -->
+        <div class="repositories-grid" id="repositoriesGrid">
+          <!-- Poblado dinámicamente con JS -->
+        </div>
+
+        <!-- Sección de Datasets Almacenados -->
+        <div class="table-toolbar mt-6">
+          <div>
+            <h3 style="font-size:1.15rem; font-weight:700;">Datasets Incorporados</h3>
+            <p style="font-size:0.8rem; color:var(--text-dim);">Lotes masivos con esquemas, descriptores y muestras para modelado</p>
+          </div>
+          <div class="toolbar-filters">
+            <select id="repoFilterSelect" class="select-filter-sm">
+              <option value="">Todos los Repositorios</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-container-card">
+          <table class="crm-table">
+            <thead>
+              <tr>
+                <th>DATASET / NOMBRE</th>
+                <th>REPOSITORIO</th>
+                <th>FORMATO</th>
+                <th>REGISTROS</th>
+                <th>TAMAÑO</th>
+                <th>CALIDAD DE DATOS</th>
+                <th style="text-align: right;">ACCIONES</th>
+              </tr>
+            </thead>
+            <tbody id="datasetsTableBody">
+              <!-- Poblado dinámicamente -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- VISTA 2.7: COMPARADOR DE DATASETS (DIFF & DRIFT ENGINE) -->
+      <section id="viewCompare" class="view-panel">
+        <!-- Selector de Datasets a Contrastar -->
+        <div class="compare-selector-card">
+          <div class="card-header-row">
+            <div>
+              <h3>Motor de Comparación Big Data (Dataset Diff & Drift)</h3>
+              <span class="subtext">Analiza variaciones volumétricas, cambios de esquema (Schema Diff) y deriva estadística (Data Drift)</span>
+            </div>
+            <span class="badge-accent">Engine v2.0</span>
+          </div>
+
+          <div class="compare-selection-grid">
+            <div class="compare-select-col">
+              <label for="selectDatasetA">Dataset A (Línea Base / Referencia)</label>
+              <select id="selectDatasetA" class="compare-dropdown">
+                <!-- Opciones dinámicas -->
+              </select>
+            </div>
+
+            <div class="compare-vs-badge">
+              <span>VS</span>
+            </div>
+
+            <div class="compare-select-col">
+              <label for="selectDatasetB">Dataset B (Lote a Contrastar)</label>
+              <select id="selectDatasetB" class="compare-dropdown">
+                <!-- Opciones dinámicas -->
+              </select>
+            </div>
+
+            <div class="compare-btn-col">
+              <label>&nbsp;</label>
+              <button id="executeCompareBtn" class="btn-primary-glow btn-full">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5"/><path d="M4 20L21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg>
+                <span>Comparar Datasets</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Presets Rápidos de Comparación -->
+          <div class="compare-presets-strip">
+            <span class="preset-label">Comparaciones Rápidas Recomendadas:</span>
+            <button id="presetCompareTrans" class="btn-preset-chip active">
+              ⚡ Transacciones Q1 vs Q2 2026 (Detectar Data Drift)
+            </button>
+            <button id="presetCompareCloud" class="btn-preset-chip">
+              ☁️ Telemetría AWS: Virginia vs São Paulo
+            </button>
+          </div>
+        </div>
+
+        <!-- Área de Resultados de la Comparación -->
+        <div id="compareResultsArea" class="compare-results-wrapper">
+          <!-- Tarjeta de Diagnóstico Ejecutivo -->
+          <div class="dashboard-card drift-diagnosis-card">
+            <div class="diag-header-row">
+              <div class="diag-left">
+                <span class="diag-pretitle">DIAGNÓSTICO GENERAL DE SALUD Y DERIVA</span>
+                <h2 id="diagResultTitle">Deriva de Datos (Data Drift) Detectada</h2>
+              </div>
+              <div id="diagBadge" class="drift-level-badge yellow">
+                <span>●</span>
+                <span id="diagBadgeText">Drift Moderado</span>
+              </div>
+            </div>
+            <p id="diagSummaryText" class="diag-summary">
+              Se detecta un incremento del <strong>+32.4%</strong> en el volumen de registros y la aparición de <strong>1 columna nueva</strong> ("score_riesgo_ia"). La variable crítica <strong>monto</strong> presenta un desplazamiento medio de <strong>+25.54%</strong>. Se recomienda actualizar los pesos de los modelos de Machine Learning.
+            </p>
+          </div>
+
+          <!-- Cuadrícula de Métricas Clave A vs B -->
+          <div class="kpi-grid mt-4">
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-label">TOTAL DE REGISTROS (FILAS)</span>
+                <div class="kpi-icon-badge blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
+              </div>
+              <div class="kpi-compare-row">
+                <div><span class="compare-tag-label">A:</span> <strong id="cmpRowsA">1.45 M</strong></div>
+                <div class="compare-arrow">→</div>
+                <div><span class="compare-tag-label">B:</span> <strong id="cmpRowsB">1.92 M</strong></div>
+              </div>
+              <div id="cmpRowsDiff" class="kpi-footer-text up">▲ +470,000 (+32.4%)</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-label">TAMAÑO EN DISCO</span>
+                <div class="kpi-icon-badge indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
+              </div>
+              <div class="kpi-compare-row">
+                <div><span class="compare-tag-label">A:</span> <strong id="cmpSizeA">420.5 MB</strong></div>
+                <div class="compare-arrow">→</div>
+                <div><span class="compare-tag-label">B:</span> <strong id="cmpSizeB">585.2 MB</strong></div>
+              </div>
+              <div id="cmpSizeDiff" class="kpi-footer-text up">▲ +164.7 MB (+39.2%)</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-label">SCORE CALIDAD DE DATOS</span>
+                <div class="kpi-icon-badge emerald"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+              </div>
+              <div class="kpi-compare-row">
+                <div><span class="compare-tag-label">A:</span> <strong id="cmpQualA">98%</strong></div>
+                <div class="compare-arrow">→</div>
+                <div><span class="compare-tag-label">B:</span> <strong id="cmpQualB">95%</strong></div>
+              </div>
+              <div id="cmpQualDiff" class="kpi-footer-text">-3% (Índice de integridad)</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-label">TASA DE VALORES NULOS</span>
+                <div class="kpi-icon-badge cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></div>
+              </div>
+              <div class="kpi-compare-row">
+                <div><span class="compare-tag-label">A:</span> <strong id="cmpNullsA">0.4%</strong></div>
+                <div class="compare-arrow">→</div>
+                <div><span class="compare-tag-label">B:</span> <strong id="cmpNullsB">1.2%</strong></div>
+              </div>
+              <div id="cmpNullsDiff" class="kpi-footer-text">+0.8% nulos detectados</div>
+            </div>
+          </div>
+
+          <!-- Comparación de Esquema (Schema Diff) -->
+          <div class="dashboard-card mt-4">
+            <div class="card-header-row">
+              <div>
+                <h3>Comparación de Esquemas (Schema Diff)</h3>
+                <span class="subtext">Similitud estructural y consistencia de tipos de datos</span>
+              </div>
+              <span id="schemaSimilarityBadge" class="badge-accent">87.5% Coincidencia</span>
+            </div>
+
+            <div class="schema-diff-container">
+              <!-- Columnas Coincidentes -->
+              <div class="schema-group">
+                <div class="schema-group-title">
+                  <span class="dot-green"></span>
+                  <strong>Columnas Coincidentes en Ambos Datasets (<span id="countSharedCols">0</span>)</strong>
+                </div>
+                <div id="schemaSharedCols" class="schema-chips-cloud"></div>
+              </div>
+
+              <!-- Columnas Exclusivas de A -->
+              <div class="schema-group">
+                <div class="schema-group-title">
+                  <span class="dot-blue"></span>
+                  <strong>Columnas Exclusivas de Dataset A (<span id="countUniqueA">0</span>)</strong>
+                </div>
+                <div id="schemaUniqueACols" class="schema-chips-cloud"></div>
+              </div>
+
+              <!-- Columnas Exclusivas de B (Nuevas) -->
+              <div class="schema-group">
+                <div class="schema-group-title">
+                  <span class="dot-purple"></span>
+                  <strong>Columnas Exclusivas de Dataset B / Nuevas (<span id="countUniqueB">0</span>)</strong>
+                </div>
+                <div id="schemaUniqueBCols" class="schema-chips-cloud"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Análisis de Desviación Estadística (Data Drift) -->
+          <div class="dashboard-card mt-4">
+            <div class="card-header-row">
+              <div>
+                <h3>Análisis de Desviación Estadística (Variables Numéricas Clave)</h3>
+                <span class="subtext">Detección de desplazamientos en distribuciones y medias matemáticas</span>
+              </div>
+            </div>
+
+            <div class="table-container-card">
+              <table class="crm-table">
+                <thead>
+                  <tr>
+                    <th>VARIABLE / COLUMNA</th>
+                    <th>MEDIA EN DATASET A</th>
+                    <th>MEDIA EN DATASET B</th>
+                    <th>DESPLAZAMIENTO (%)</th>
+                    <th>NIVEL DE DRIFT</th>
+                  </tr>
+                </thead>
+                <tbody id="driftTableBody">
+                  <!-- Se puebla dinámicamente -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Muestra de Datos Lado a Lado -->
+          <div class="dashboard-card mt-4">
+            <div class="card-header-row">
+              <div>
+                <h3>Vista Previa de Filas Lado a Lado (Side-by-Side Sample)</h3>
+                <span class="subtext">Comparación visual de los primeros registros de cada lote</span>
+              </div>
+              <button id="downloadCompareReportBtn" class="btn-outline">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span>Descargar Reporte Diff (JSON)</span>
+              </button>
+            </div>
+
+            <div class="side-by-side-preview-grid">
+              <div class="preview-half">
+                <h4 id="previewTitleA" class="preview-side-title">Muestra Dataset A</h4>
+                <div class="sample-scroll-box" id="sampleDataA"></div>
+              </div>
+              <div class="preview-half">
+                <h4 id="previewTitleB" class="preview-side-title">Muestra Dataset B</h4>
+                <div class="sample-scroll-box" id="sampleDataB"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+
+  <!-- ======================================================== -->
+  <!-- MODALES INTERACTIVOS                                     -->
+  <!-- ======================================================== -->
+
+  <!-- MODAL 1: REGISTRO DE NUEVA CUENTA -->
+  <div id="registerModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Crear Cuenta en Datanova CRM</h3>
+        <button type="button" class="btn-close-modal" id="closeRegisterModalBtn">&times;</button>
+      </div>
+      <form id="formRegisterAccount" onsubmit="return false;">
+        <div class="form-group">
+          <label for="regName">Nombre Completo</label>
+          <input type="text" id="regName" placeholder="Ej. Sofía Ramírez" required>
+        </div>
+        <div class="form-group">
+          <label for="regEmail">Correo Institucional</label>
+          <input type="email" id="regEmail" placeholder="sramirez@datanova.com" required>
+        </div>
+        <div class="form-group">
+          <label for="regRole">Rol en el CRM</label>
+          <select id="regRole">
+            <option value="Ejecutivo Comercial">Ejecutivo Comercial</option>
+            <option value="Gerente de Ventas">Gerente de Ventas</option>
+            <option value="Administrador">Administrador</option>
+            <option value="Especialista en Operaciones">Especialista en Operaciones</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="regPassword">Contraseña</label>
+          <input type="password" id="regPassword" placeholder="Mínimo 6 caracteres" required>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" id="cancelRegisterModalBtn">Cancelar</button>
+          <button type="submit" id="submitRegisterBtn" class="btn-primary-glow">Crear Cuenta</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 2: ENROLAR ROSTRO (DESDE LOGIN O DASHBOARD) -->
+  <div id="faceEnrollModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card modal-large">
+      <div class="modal-header">
+        <h3>Enrolamiento Facial Biométrico</h3>
+        <button type="button" class="btn-close-modal" id="closeFaceEnrollModalBtn">&times;</button>
+      </div>
+
+      <div class="enroll-modal-body">
+        <div class="enroll-cam-container">
+          <video id="modalWebcam" autoplay muted playsinline></video>
+          <canvas id="modalFaceCanvas"></canvas>
+          <div class="hud-reticle">
+            <div class="reticle-corner top-left"></div>
+            <div class="reticle-corner top-right"></div>
+            <div class="reticle-corner bottom-left"></div>
+            <div class="reticle-corner bottom-right"></div>
+            <div class="scan-laser"></div>
+          </div>
+          <div id="modalCamStatusText" class="cam-floating-status">Centra tu rostro frente a la cámara</div>
+        </div>
+
+        <div class="enroll-form-side">
+          <p class="modal-intro">
+            El sistema capturará un vector biométrico de 128 puntos característicos para vincularlo a tu identidad.
+          </p>
+
+          <div class="form-group">
+            <label for="enrollUserIdInput">Correo o ID de Usuario a Vincular</label>
+            <input type="email" id="enrollUserIdInput" placeholder="Ej. admin@datanova.com" required>
+          </div>
+
+          <div class="form-group">
+            <label for="enrollUserNameInput">Nombre del Usuario (Opcional)</label>
+            <input type="text" id="enrollUserNameInput" placeholder="Ej. Sofía Ramírez">
+          </div>
+
+          <div class="enroll-tips">
+            <strong>Consejos para una captura óptima:</strong>
+            <ul>
+              <li>Ubícate en un ambiente bien iluminado.</li>
+              <li>Mira fijamente al sensor de la cámara.</li>
+              <li>Evita lentes de sol o gorras que cubran los ojos.</li>
+            </ul>
+          </div>
+
+          <div class="modal-footer mt-4">
+            <button type="button" class="btn-ghost" id="cancelEnrollModalBtn">Cancelar</button>
+            <button type="button" id="captureAndEnrollBtn" class="btn-primary-glow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+              <span>Capturar y Guardar Rostro</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: AGREGAR / EDITAR CLIENTE -->
+  <div id="clientModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="clientModalTitle">Agregar Nuevo Cliente</h3>
+        <button type="button" class="btn-close-modal" id="closeClientModalBtn">&times;</button>
+      </div>
+
+      <form id="formClient" onsubmit="return false;">
+        <input type="hidden" id="clientIdInput" value="">
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="clientNameInput">Nombre Completo *</label>
+            <input type="text" id="clientNameInput" placeholder="Ej. Carlos Vives" required>
+          </div>
+          <div class="form-group">
+            <label for="clientCompanyInput">Empresa</label>
+            <input type="text" id="clientCompanyInput" placeholder="Ej. Grupo Andino S.A.">
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="clientEmailInput">Correo Electrónico</label>
+            <input type="email" id="clientEmailInput" placeholder="contacto@empresa.com">
+          </div>
+          <div class="form-group">
+            <label for="clientPhoneInput">Teléfono</label>
+            <input type="text" id="clientPhoneInput" placeholder="+57 300 123 4567">
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="clientStatusInput">Etapa del Cliente</label>
+            <select id="clientStatusInput">
+              <option value="Lead">Lead</option>
+              <option value="Contactado">Contactado</option>
+              <option value="Propuesta">Propuesta</option>
+              <option value="Negociación">Negociación</option>
+              <option value="Ganado">Ganado</option>
+              <option value="Perdido">Perdido</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="clientValueInput">Valor Estimado ($ USD)</label>
+            <input type="number" id="clientValueInput" placeholder="Ej. 15000" min="0">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="clientNotesInput">Notas / Requerimientos</label>
+          <textarea id="clientNotesInput" rows="3" placeholder="Detalles de la oportunidad..."></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" id="cancelClientModalBtn">Cancelar</button>
+          <button type="submit" id="saveClientBtn" class="btn-primary-glow">Guardar Cliente</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 4: NUEVO DEAL KANBAN -->
+  <div id="dealModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Crear Oportunidad Comercial (Deal)</h3>
+        <button type="button" class="btn-close-modal" id="closeDealModalBtn">&times;</button>
+      </div>
+
+      <form id="formDeal" onsubmit="return false;">
+        <div class="form-group">
+          <label for="dealTitleInput">Título de la Oportunidad *</label>
+          <input type="text" id="dealTitleInput" placeholder="Ej. Licencias CRM Cloud + Biometría" required>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="dealClientSelect">Cliente Asociado</label>
+            <select id="dealClientSelect">
+              <!-- Se puebla con clientes existentes -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="dealAmountInput">Monto ($ USD) *</label>
+            <input type="number" id="dealAmountInput" placeholder="25000" required min="0">
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="dealStageInput">Etapa Inicial</label>
+            <select id="dealStageInput">
+              <option value="Prospecto">Prospecto</option>
+              <option value="Contactado">Contactado</option>
+              <option value="Propuesta">Propuesta</option>
+              <option value="Negociación">Negociación</option>
+              <option value="Ganado">Cerrado Ganado</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="dealCloseDateInput">Fecha Estimada de Cierre</label>
+            <input type="date" id="dealCloseDateInput">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" id="cancelDealModalBtn">Cancelar</button>
+          <button type="submit" id="saveDealBtn" class="btn-primary-glow">Crear Deal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 5: NUEVO REPOSITORIO BIG DATA -->
+  <div id="repoModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Crear Repositorio Big Data (Data Lake)</h3>
+        <button type="button" class="btn-close-modal" id="closeRepoModalBtn">&times;</button>
+      </div>
+
+      <form id="formRepo" onsubmit="return false;">
+        <div class="form-group">
+          <label for="repoNameInput">Nombre del Repositorio *</label>
+          <input type="text" id="repoNameInput" placeholder="Ej. Data Lake Transacciones AWS S3" required>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="repoCategoryInput">Categoría de Datos</label>
+            <select id="repoCategoryInput">
+              <option value="Finanzas & Fraude">Finanzas & Fraude</option>
+              <option value="DevOps & Nube">DevOps & Nube</option>
+              <option value="Customer Intelligence">Customer Intelligence</option>
+              <option value="IoT & Sensores">IoT & Sensores</option>
+              <option value="Machine Learning & IA">Machine Learning & IA</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="repoStorageTypeInput">Tecnología de Almacenamiento</label>
+            <select id="repoStorageTypeInput">
+              <option value="AWS S3 / Apache Parquet">AWS S3 / Apache Parquet</option>
+              <option value="AWS OpenSearch / Delta Lake">AWS OpenSearch / Delta Lake</option>
+              <option value="Snowflake / Data Cloud">Snowflake / Data Cloud</option>
+              <option value="PostgreSQL Federated">PostgreSQL Federated</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="repoRegionInput">Región Cloud AWS</label>
+            <select id="repoRegionInput">
+              <option value="us-east-1 (N. Virginia)">us-east-1 (N. Virginia)</option>
+              <option value="sa-east-1 (São Paulo)">sa-east-1 (São Paulo)</option>
+              <option value="us-west-2 (Oregon)">us-west-2 (Oregon)</option>
+              <option value="eu-central-1 (Frankfurt)">eu-central-1 (Frankfurt)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="repoTagsInput">Etiquetas (separadas por coma)</label>
+            <input type="text" id="repoTagsInput" placeholder="Transacciones, ML, Spark, Parquet">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="repoDescInput">Descripción y Propósito</label>
+          <textarea id="repoDescInput" rows="3" placeholder="Detalles de la fuente de datos, políticas de retención..."></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" id="cancelRepoModalBtn">Cancelar</button>
+          <button type="submit" id="saveRepoBtn" class="btn-primary-glow">Crear Repositorio</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 6: INCORPORAR NUEVO DATASET -->
+  <div id="datasetModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card modal-large">
+      <div class="modal-header">
+        <h3>Incorporar Nuevo Dataset a Repositorio Big Data</h3>
+        <button type="button" class="btn-close-modal" id="closeDatasetModalBtn">&times;</button>
+      </div>
+
+      <form id="formDataset" onsubmit="return false;">
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="datasetRepoSelect">Repositorio Destino *</label>
+            <select id="datasetRepoSelect" required>
+              <!-- Poblado dinámicamente -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="datasetNameInput">Nombre del Dataset / Archivo *</label>
+            <input type="text" id="datasetNameInput" placeholder="Ej. Eventos_Clickstream_Mayo_2026.parquet" required>
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="datasetFormatSelect">Formato Big Data</label>
+            <select id="datasetFormatSelect">
+              <option value="Parquet">Apache Parquet (Recomendado)</option>
+              <option value="JSON">JSON / NDJSON</option>
+              <option value="CSV">CSV Comma Separated</option>
+              <option value="Delta">Delta Lake Table</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="datasetRowsInput">Número Estimado de Registros (Filas)</label>
+            <input type="number" id="datasetRowsInput" placeholder="1000000" min="1" value="1500000">
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="datasetSizeInput">Tamaño Estimado (MB)</label>
+            <input type="number" id="datasetSizeInput" placeholder="450.5" step="0.1" value="450">
+          </div>
+          <div class="form-group">
+            <label for="datasetQualityInput">Índice de Calidad Estimado (%)</label>
+            <input type="number" id="datasetQualityInput" min="50" max="100" value="98">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="datasetDescInput">Descripción del Lote / Partición</label>
+          <input type="text" id="datasetDescInput" placeholder="Partición temporal procesada con Apache Spark">
+        </div>
+
+        <div class="form-group">
+          <label for="datasetSampleCsv">Pegar Muestra de Datos CSV o JSON (Opcional - Detección Automática de Schema)</label>
+          <textarea id="datasetSampleCsv" rows="3" placeholder="id,monto,categoria,latitud,aprobado&#10;1,150.50,Retail,4.60,true&#10;2,820.00,Fintech,4.65,false&#10;3,45.00,Online,19.43,true"></textarea>
+          <span style="font-size:0.75rem; color:var(--text-dim);">Si dejas este campo en blanco, el motor generará automáticamente un esquema sintético optimizado.</span>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" id="cancelDatasetModalBtn">Cancelar</button>
+          <button type="submit" id="saveDatasetBtn" class="btn-primary-glow">Incorporar Dataset</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 7: DETALLE / ESQUEMA DE DATASET -->
+  <div id="datasetDetailModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card modal-large">
+      <div class="modal-header">
+        <div>
+          <h3 id="detailDatasetTitle">Esquema del Dataset</h3>
+          <span id="detailDatasetSubtitle" style="font-size:0.8rem; color:var(--text-dim);"></span>
+        </div>
+        <button type="button" class="btn-close-modal" id="closeDetailDatasetModalBtn">&times;</button>
+      </div>
+
+      <div class="dataset-detail-content">
+        <h4 style="font-size:0.9rem; margin-bottom:8px; color:var(--text-muted);">Estructura de Columnas & Metadatos</h4>
+        <div class="table-container-card mb-4" style="max-height:220px; overflow-y:auto;">
+          <table class="crm-table">
+            <thead>
+              <tr>
+                <th>COLUMNA</th>
+                <th>TIPO</th>
+                <th>VALOR MEDIO</th>
+                <th>MÍNIMO</th>
+                <th>MÁXIMO</th>
+              </tr>
+            </thead>
+            <tbody id="detailSchemaTableBody"></tbody>
+          </table>
+        </div>
+
+        <h4 style="font-size:0.9rem; margin:14px 0 8px; color:var(--text-muted);">Muestra de Registros (Primeras Filas)</h4>
+        <div class="table-container-card" style="max-height:200px; overflow-y:auto;">
+          <table class="crm-table" id="detailSampleTable">
+            <thead id="detailSampleHead"></thead>
+            <tbody id="detailSampleBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="modal-footer mt-4">
+        <button type="button" class="btn-ghost" id="closeDetailBtn">Cerrar</button>
+        <button type="button" class="btn-primary-glow" id="sendDetailToCompareBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path d="M16 3h5v5"/><path d="M4 20L21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg>
+          <span>Llevar a Comparador</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Archivo JavaScript con Toda la Lógica Integrada -->
+  <script src="app.js"></script>
+</body>
+</html>
