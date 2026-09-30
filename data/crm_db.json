@@ -783,13 +783,43 @@
       "title": "Prueba de Concepto Biometría",
       "clientId": "cli_5",
       "clientName": "BioSalud Digital",
-      "stage": "Prospecto",
+      "stage": "Contactado",
       "amount": 9500,
       "probability": 20,
       "expectedClose": "2026-11-30"
     }
   ],
   "logs": [
+    {
+      "id": "log_1790750292238",
+      "type": "bigdata_comparison",
+      "description": "Comparación ejecutada: Logs_Transaccionales_Test.parquet vs Logs_Transaccionales_Test.parquet",
+      "userId": "system",
+      "userName": "Sistema",
+      "details": "Diagnóstico: Bajo / Estable | Delta filas: 0%",
+      "ip": "::1",
+      "timestamp": "2026-09-30T06:38:12.238Z"
+    },
+    {
+      "id": "log_1790750239728",
+      "type": "auth_normal",
+      "description": "Inicio de sesión con contraseña",
+      "userId": "abdeel@datanova.com",
+      "userName": "Abdeel Borja",
+      "details": "Acceso exitoso al CRM",
+      "ip": "::1",
+      "timestamp": "2026-09-30T06:37:19.728Z"
+    },
+    {
+      "id": "log_1790750235004",
+      "type": "auth_failed",
+      "description": "Intento de acceso fallido",
+      "userId": "abdeel@datanova.com",
+      "userName": "Abdeel Borja",
+      "details": "Contraseña incorrecta",
+      "ip": "::1",
+      "timestamp": "2026-09-30T06:37:15.004Z"
+    },
     {
       "id": "log_1790747200340",
       "type": "auth_normal",
